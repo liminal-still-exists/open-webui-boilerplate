@@ -154,9 +154,3 @@ pip install --upgrade open-webui
 ```text
 .\backups\open-webui-data-YYYYMMDD-HHMMSS
 ```
-
-# 복구 메모
-- 같은 `venv`를 유지하는 경우에는 백업한 `data` 폴더를 원래 위치에 되돌리는 방식으로 복구를 시도한다.
-- `.webui_secret_key`는 업데이트만 하는 상황에서는 보통 건드릴 일이 없다.
-- 버전 차이가 큰 경우 DB 마이그레이션이나 벡터 DB 재생성이 필요할 수 있다.
-- 장기적으로는 데이터 위치를 패키지 바깥으로 빼는 것이 더 안전하지만, 이 환경에서는 과거에 경로 인식 문제가 있었으므로 신중히 진행한다.
