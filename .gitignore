@@ -1,0 +1,15 @@
+node_modules/
+*.lock
+.aider*
+
+# Runtime and local tooling
+.git/
+.gemini/
+venv/
+logs/
+backups/
+__pycache__/
+*.pyc
+
+# Secrets and local state
+.webui_secret_key
