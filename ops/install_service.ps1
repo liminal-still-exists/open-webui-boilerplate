@@ -38,7 +38,7 @@ New-Item -ItemType Directory -Force -Path $logsDir | Out-Null
 & $nssmExe set $serviceName AppStderr (Join-Path $logsDir "open-webui-service.err.log")
 & $nssmExe set $serviceName AppRotateFiles 1
 & $nssmExe set $serviceName AppRotateOnline 1
-& $nssmExe set $serviceName AppRotateBytes 10485760
+& $nssmExe set $serviceName AppRotateBytes 1048576
 
 Write-Host ""
 Write-Host "서비스 등록이 완료되었습니다." -ForegroundColor Green
