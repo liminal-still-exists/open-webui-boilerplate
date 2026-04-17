@@ -4,7 +4,7 @@
 
 # 운영 기준 파일
 - 설정: `.\ops\open_webui_config.ps1`
-- 서비스 설치: `.\ops\install_service.ps1`
+- 서비스 설치: `.\ops\register_windows_services.ps1`
 - 서비스 재시작: `.\ops\restart_service.ps1`
 - 백업 및 업데이트: `.\ops\backup_and_update_open_webui.ps1`
 - 수동 직접 실행: `.\run_open_webui.ps1`
@@ -34,7 +34,7 @@
 서비스 설치:
 
 ```powershell
-.\ops\install_service.ps1
+.\ops\register_windows_services.ps1
 ```
 
 서비스 재시작:
