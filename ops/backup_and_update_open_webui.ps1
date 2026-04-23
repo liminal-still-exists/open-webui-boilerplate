@@ -7,6 +7,7 @@ $pythonExe = $config.PythonExe
 $pipArgs = @("-m", "pip")
 $dataDir = $config.DataDir
 $backupRoot = $config.BackupRoot
+$serviceName = $config.ServiceName
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $backupDir = Join-Path $backupRoot "open-webui-data-$timestamp"
 
@@ -62,9 +63,25 @@ Write-Host "작업 폴더: $projectDir"
 Test-RequiredPath -Path $pythonExe -Description "Python 실행 파일"
 Test-RequiredPath -Path $dataDir -Description "Open WebUI 데이터 폴더"
 
+$service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+$restartServiceAfterUpdate = $false
+if ($service -and $service.Status -ne "Stopped") {
+    $restartServiceAfterUpdate = $true
+    Write-Host "$serviceName 서비스를 중지합니다." -ForegroundColor Yellow
+    Stop-Service -Name $serviceName -Force
+    $service.WaitForStatus("Stopped", [TimeSpan]::FromSeconds(60))
+}
+
 $runningProcess = Get-Process -Name "open-webui" -ErrorAction SilentlyContinue
 if ($runningProcess) {
-    throw "open-webui 프로세스가 실행 중입니다. 먼저 종료한 뒤 다시 실행해 주세요."
+    Write-Host "실행 중인 open-webui 프로세스를 종료합니다." -ForegroundColor Yellow
+    $runningProcess | Stop-Process -Force
+    Start-Sleep -Seconds 2
+}
+
+$remainingProcess = Get-Process -Name "open-webui" -ErrorAction SilentlyContinue
+if ($remainingProcess) {
+    throw "open-webui 프로세스를 종료하지 못했습니다. 잠시 후 다시 시도해 주세요."
 }
 
 $currentVersion = Get-OpenWebuiVersion
@@ -75,6 +92,11 @@ Write-Host "최신 open-webui 버전: $latestVersion" -ForegroundColor Yellow
 if ($latestVersion -ne "(확인 불가)" -and $currentVersion -eq $latestVersion) {
     Write-Host ""
     Write-Host "이미 최신 버전입니다. 백업과 업데이트를 건너뜁니다." -ForegroundColor Green
+    if ($restartServiceAfterUpdate) {
+        Write-Host "$serviceName 서비스를 다시 시작합니다." -ForegroundColor Yellow
+        Start-Service -Name $serviceName
+        (Get-Service -Name $serviceName).WaitForStatus("Running", [TimeSpan]::FromSeconds(60))
+    }
     exit 0
 }
 
@@ -96,3 +118,8 @@ Write-Host ""
 Write-Host "업데이트가 완료되었습니다." -ForegroundColor Green
 Write-Host "버전: $currentVersion -> $updatedVersion"
 Write-Host "data 백업 위치: $backupDir"
+if ($restartServiceAfterUpdate) {
+    Write-Host "$serviceName 서비스를 다시 시작합니다." -ForegroundColor Yellow
+    Start-Service -Name $serviceName
+    (Get-Service -Name $serviceName).WaitForStatus("Running", [TimeSpan]::FromSeconds(60))
+}
